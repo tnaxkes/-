@@ -1142,35 +1142,35 @@
     <div class="cta-title">Готов автоматизировать<br><span>ваш бизнес</span></div>
     <p class="cta-sub">Расскажите о задаче — отвечу в течение нескольких часов. Первая консультация бесплатно.</p>
 
-    <div class="contact-form">
-      <div class="form-group">
-        <label class="form-label">Ваше имя</label>
-        <input type="text" class="form-input" placeholder="Иван Петров">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Telegram / Телефон</label>
-        <input type="text" class="form-input" placeholder="@username или +7 900 000-00-00">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Тип задачи</label>
-        <select class="form-select">
-          <option value="">Выберите направление...</option>
-          <option>Автоматизация процессов</option>
-          <option>AI-бот или агент</option>
-          <option>Интеграция систем</option>
-          <option>Веб-разработка</option>
-          <option>BI-дашборд</option>
-          <option>Другое</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Расскажите о задаче</label>
-        <textarea class="form-textarea" placeholder="Что хотите автоматизировать? Какие системы используете? Какой ожидаемый результат?"></textarea>
-      </div>
-      <button class="form-submit" onclick="this.textContent='✓ Отправлено! Скоро свяжусь'; this.style.background='#28c840'">
-        Отправить заявку →
-      </button>
-    </div>
+    <form class="contact-form" id="lead-form">
+  <div class="form-group">
+    <label class="form-label" for="name">Ваше имя</label>
+    <input id="name" name="name" type="text" class="form-input" placeholder="Иван Петров" required>
+  </div>
+  <div class="form-group">
+    <label class="form-label" for="contact">Telegram / Телефон</label>
+    <input id="contact" name="contact" type="text" class="form-input" placeholder="@username или +7 900 000-00-00" required>
+  </div>
+  <div class="form-group">
+    <label class="form-label" for="taskType">Тип задачи</label>
+    <select id="taskType" name="taskType" class="form-select" required>
+      <option value="">Выберите направление...</option>
+      <option>Автоматизация процессов</option>
+      <option>AI-бот или агент</option>
+      <option>Интеграция систем</option>
+      <option>Веб-разработка</option>
+      <option>BI-дашборд</option>
+      <option>Другое</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label class="form-label" for="message">Расскажите о задаче</label>
+    <textarea id="message" name="message" class="form-textarea" placeholder="Что хотите автоматизировать? Какие системы используете? Какой ожидаемый результат?" required></textarea>
+  </div>
+  <button type="submit" class="form-submit" id="submitBtn">
+    Отправить заявку →
+  </button>
+</form>
   </div>
 </section>
 
@@ -1205,6 +1205,63 @@
       ? 'rgba(5,5,8,0.95)'
       : 'rgba(5,5,8,0.8)';
   });
+
+  // Form submit to n8n webhook
+  const leadForm = document.getElementById('lead-form');
+  const submitBtn = document.getElementById('submitBtn');
+
+  if (leadForm) {
+    leadForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const payload = {
+        name: document.getElementById('name').value.trim(),
+        contact: document.getElementById('contact').value.trim(),
+        taskType: document.getElementById('taskType').value,
+        message: document.getElementById('message').value.trim()
+      };
+
+      if (!payload.name || !payload.contact || !payload.taskType || !payload.message) {
+        submitBtn.textContent = 'Заполните все поля';
+        setTimeout(() => {
+          submitBtn.textContent = 'Отправить заявку →';
+        }, 2000);
+        return;
+      }
+
+      const originalText = 'Отправить заявку →';
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Отправка...';
+
+      try {
+        const response = await fetch('https://6et7r1i4.rpcl.app/webhook/b615dee6-a2b0-4d02-b7cd-c0aeaf831fce', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+          submitBtn.textContent = '✓ Отправлено! Скоро свяжусь';
+          submitBtn.style.background = '#28c840';
+          leadForm.reset();
+        } else {
+          submitBtn.textContent = 'Ошибка отправки';
+          setTimeout(() => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+          }, 2500);
+        }
+      } catch (error) {
+        submitBtn.textContent = 'Ошибка отправки';
+        setTimeout(() => {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+        }, 2500);
+      }
+    });
+  }
 </script>
 </body>
 </html>
