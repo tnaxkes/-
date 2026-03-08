@@ -1145,15 +1145,15 @@
     <div class="contact-form">
       <div class="form-group">
         <label class="form-label">Ваше имя</label>
-        <input type="text" id="name" name="name" class="form-input" placeholder="Иван Петров">
+        <input type="text" class="form-input" placeholder="Иван Петров">
       </div>
       <div class="form-group">
         <label class="form-label">Telegram / Телефон</label>
-        <input type="text" id="contact" name="contact" class="form-input" placeholder="@username или +7 900 000-00-00">
+        <input type="text" class="form-input" placeholder="@username или +7 900 000-00-00">
       </div>
       <div class="form-group">
         <label class="form-label">Тип задачи</label>
-        <select id="taskType" name="taskType" class="form-select">
+        <select class="form-select">
           <option value="">Выберите направление...</option>
           <option>Автоматизация процессов</option>
           <option>AI-бот или агент</option>
@@ -1165,9 +1165,9 @@
       </div>
       <div class="form-group">
         <label class="form-label">Расскажите о задаче</label>
-        <textarea id="message" name="message" class="form-textarea" placeholder="Что хотите автоматизировать? Какие системы используете? Какой ожидаемый результат?"></textarea>
+        <textarea class="form-textarea" placeholder="Что хотите автоматизировать? Какие системы используете? Какой ожидаемый результат?"></textarea>
       </div>
-      <button id="submitBtn" class="form-submit">
+      <button class="form-submit" onclick="this.textContent='✓ Отправлено! Скоро свяжусь'; this.style.background='#28c840'">
         Отправить заявку →
       </button>
     </div>
@@ -1204,56 +1204,6 @@
     nav.style.background = window.scrollY > 50
       ? 'rgba(5,5,8,0.95)'
       : 'rgba(5,5,8,0.8)';
-  });
-
-  // ── FORM SUBMIT ──
-  document.getElementById('submitBtn').addEventListener('click', async () => {
-    const name     = document.getElementById('name').value.trim();
-    const contact  = document.getElementById('contact').value.trim();
-    const taskType = document.getElementById('taskType').value.trim();
-    const message  = document.getElementById('message').value.trim();
-    const btn      = document.getElementById('submitBtn');
-
-    if (!name || !contact || !taskType || !message) {
-      btn.textContent = 'Заполните все поля';
-      btn.style.background = '#ff4f7b';
-      setTimeout(() => {
-        btn.textContent = 'Отправить заявку →';
-        btn.style.background = '';
-      }, 2500);
-      return;
-    }
-
-    btn.textContent = 'Отправка...';
-    btn.disabled = true;
-    btn.style.background = '';
-
-    try {
-      const res = await fetch('https://6et7r1i4.rpcl.app/webhook/b615dee6-a2b0-4d02-b7cd-c0aeaf831fce', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, contact, taskType, message })
-      });
-
-      if (!res.ok) throw new Error('Network error');
-
-      btn.textContent = '✓ Отправлено! Скоро свяжусь';
-      btn.style.background = '#28c840';
-
-      document.getElementById('name').value     = '';
-      document.getElementById('contact').value  = '';
-      document.getElementById('taskType').value = '';
-      document.getElementById('message').value  = '';
-
-    } catch (e) {
-      btn.textContent = 'Ошибка отправки';
-      btn.style.background = '#ff4f7b';
-      setTimeout(() => {
-        btn.textContent = 'Отправить заявку →';
-        btn.style.background = '';
-        btn.disabled = false;
-      }, 3000);
-    }
   });
 </script>
 </body>
